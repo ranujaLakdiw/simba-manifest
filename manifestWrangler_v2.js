@@ -232,8 +232,8 @@ const filterPickupData = (rowsArray) => {
         if (cleanedRow['Vehicle'] !== undefined) {
             let rego = String(cleanedRow['Vehicle']); // Ensure it's a string
             // Remove location codes from the end of the string
-            LOCATION_CODES.forEach((loc) => {
-                regp = snip(rego, loc);
+            LOCATION_CODES.forEach((loc) => {                
+                rego = snip(rego, loc);
             });
 
             cleanedRow['Rego (ready)'] = rego;
@@ -436,13 +436,12 @@ const uploadToGoogleSheet = async (dataObject, url) => {
 
             // Basic check if the request was successful (status 200-299)
             // Google Apps Script redirects often result in opaque responses if not configured for CORS,
-            // so we might not get detailed success/failure info here without Apps Script changes.
             if (!response.ok && response.type !== 'opaque') {
                 // Try to get error details if possible
                 const errorText = await response.text();
                 console.warn(`Warning: Fetch response not OK for row ${i + 1}. Status: ${response.status}. Details: ${errorText}`);
                 // Decide if you want to stop the upload or continue
-                // throw new Error(`Upload failed for row ${i + 1}: Status ${response.status}`);
+                throw new Error(`Upload failed for row ${i + 1}: Status ${response.status}`);
             }
             // Update progress percentage
             const percentComplete = Math.floor(((i + 1) / totalRows) * 100);
@@ -462,11 +461,12 @@ const uploadToGoogleSheet = async (dataObject, url) => {
     if (loaderElement) loaderElement.style.display = 'none'; // Hide loader
     if (loaderPercentElement) loaderPercentElement.textContent = ''; // Clear percentage
     window.alert('File submitted successfully! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧');
-    // window.location.reload(); // Reload the page after successful submission
+    window.location.reload(); // Reload the page after successful submission
 };
 
 
 // --- Utility Functions ---
+
 
 /**
  * Removes characters from a string starting from the first match of a regex.
@@ -477,14 +477,9 @@ const uploadToGoogleSheet = async (dataObject, url) => {
  */
 const snip = (inputString, regexp, from = 0) => {
     // Ensure input is a string
-    const snip = (inputString, regexp, from = 0) => {
-        const index = inputString.slice(from).search(regexp);
-        if (index === -1) {
-            return inputString; // Return the original if nothing rlated was found
-        } else {
-            return inputString.slice(0, index) // Adjust index back relative to original string
-        }
-    }
+    const str = String(inputString);
+    const index = str.slice(from).search(regexp);
+    return (index === -1) ? str : str.slice(from, index); // Adjust index back relative to original string
 };
 
 /**
