@@ -19,7 +19,7 @@ The tool automatically:
 * **Smart Parsing:** Automatically finds and processes data from sheets containing `"Pick"` in their name.
 * **Data Cleaning:** Removes unnecessary columns and formats key fields like `'Rego (ready)'`, `'Arrival'`, and `'Items / Notes'`.
 * **Automatic Sorting:** Sorts pickups chronologically by `'Time'`, with `'Res.'` number as a secondary sort key.
-* **Direct Google Sheet Integration:** Pushes the processed data directly into the designated `'Pickup List'` Google Sheet.
+* **Direct Google Sheet Integration:** Pushes the processed data directly into the designated `'Pickup List'` or `'Tomorrow'` Google Sheet.
 * **Progress Indicator:** Visual loader shows the progress of the upload process.
 * **New Day Data Handling:** Automatically clears the *previous* day's data when a manifest for a *new* `'Pickup Date'` is uploaded.
 * **Duplicate Prevention:** Avoids adding entries with the same `'Res.'` (Reservation) number already present for the current day.
@@ -43,7 +43,7 @@ The tool automatically:
 
 The system consists of two main parts: a frontend web page and a Google Apps Script backend.
 
-1. **Frontend (HTML, CSS, JavaScript - `app_5.js`)**
+1. **Frontend (HTML, CSS, JavaScript - `manifestWrangler.js`)**
     * User selects the daily manifest Excel file via the webpage (`index.html`).
     * JavaScript uses the `SheetJS` library (`xlsx.full.min.js`) to read the file *in the browser*.
     * It identifies sheets with `"Pick"` in the name.
@@ -76,7 +76,7 @@ Follow these steps to get the uploader working:
 
 1.  **Prepare Google Sheet:**
     * Create a new Google Sheet or use an existing one.
-    * Rename one sheet to **`Pickup List`**.
+    * Rename one sheet to **`Pickup List`** (can add `Tomorrow` sheet too, but not compulsary).
     * In the `Pickup List` sheet, set up your **Header Row in Row 2**. The column names *must exactly match* the data fields expected by the Apps Script and sent by the frontend (e.g., `#`, `Time`, `Res.`, `Name`, `Vehicle Type`, `Rego (ready)`, `Arrival`, `Items / Notes`, `Task`, etc.). Data will start appearing from Row 3.
 
 2.  **Deploy Google Apps Script:**
@@ -102,8 +102,8 @@ Follow these steps to get the uploader working:
         * *(Note: If you update the script code later, you need to create a **New deployment** again to make the changes live).*
 
 3.  **Configure Frontend:**
-    * Place the `index.html`, `style.css`, and `app_5.js` files together in a folder.
-    * Open `app_5.js` in a text editor.
+    * Place the `index.html`, `alchemy.css`, and `manifestWrangler.js` files together in a folder.
+    * Open `manifestWrangler.js` in a text editor.
     * Find the line defining the `SCRIPT_URL_TODAY` constant:
         ```javascript
         const SCRIPT_URL_TODAY = 'YOUR_WEB_APP_URL_HERE';
@@ -111,7 +111,7 @@ Follow these steps to get the uploader working:
     * Replace `'YOUR_WEB_APP_URL_HERE'` with the **Web app URL** you copied during the Apps Script deployment. Make sure it's enclosed in single quotes. Save the file.
 
 4.  **Host Frontend:**
-    * Upload the folder containing `index.html`, `style.css`, and the *updated* `app_5.js` to a web hosting provider (like GitHub Pages, Netlify, Vercel, or your company's web server).
+    * Upload the folder containing `index.html`, `alchemy.css`, and the *updated* `manifestWrangler.js` to a web hosting provider (like GitHub Pages, Netlify, Vercel, or your company's web server).
     * Alternatively, for testing, you can run a simple local web server from that folder.
 
 ## Usage Guide 📖
@@ -128,7 +128,7 @@ Follow these steps to get the uploader working:
 
 ## Important Notes ⚠️
 
-* **File Format Dependency:** The tool *heavily relies* on the specific structure of the input Excel file (Sheet names containing `"Pick"`, headers in Row 2, data from Row 3, specific column names). Changes to the manifest format will require updates to the JavaScript (`app_5.js`) and potentially the Apps Script.
+* **File Format Dependency:** The tool *heavily relies* on the specific structure of the input Excel file (Sheet names containing `"Pick"`, headers in Row 2, data from Row 3, specific column names). Changes to the manifest format will require updates to the JavaScript (`manifestWrangler.js`) and potentially the Apps Script.
 * **Data Clearing Logic:** Be aware that uploading a file with a `'Pickup Date'` different from the date currently in Row 3 of the sheet **will erase all data from Row 3 downwards** before adding the new data. Double-check the file before uploading.
 * **Duplicate Handling:** Rows are identified as duplicates based *only* on the `'Res.'` number. If a reservation needs to be updated, it might need manual handling in the sheet (or modification of the script logic).
 * **Upload Speed:** Because data is sent row-by-row with a delay (to avoid overwhelming the Apps Script), uploading very large manifests might take a noticeable amount of time.
