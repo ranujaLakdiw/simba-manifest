@@ -161,13 +161,13 @@ const processAndUploadFile = (file, url) => {
 
                     // Convert sheet data to an array of row objects.
                     // `range: 2` means "start reading data from row 3" (0-indexed is topic, 1-indexed is unrelated data, 2-indexed is header, 3 is data start).
-                    const rowsArray = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { range: 2, defval: "" }).slice(0,-1); // Using sheet_to_json
-                    
+                    const rowsArray = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { range: 2, defval: "" }).slice(0, -1); // Using sheet_to_json
+
                     // Validate format based on the first data row (if any)
                     if (rowsArray.length > 0 && rowsArray[0][VALIDATION_COLUMN] === undefined) {
                         throw new Error(`Wrong file format in sheet "${sheetName}".`);
                     }
-                    
+
                     // Omit the last row which normally has daily total revenue information
                     // const rowObject_sliced = Object.fromEntries(Object.entries(rowObject).slice(0, Object.keys(rowObject).length - 1));
 
@@ -182,13 +182,13 @@ const processAndUploadFile = (file, url) => {
                 }
             });
 
-             // --- Sorting ---
-             const sortedPickups = sortPickups(allPickups); // Sorts and re-indexes with '#'
+            // --- Sorting ---
+            const sortedPickups = sortPickups(allPickups); // Sorts and re-indexes with '#'
 
-             // --- Data Upload ---
-             // Add a special object to signal the end of data and trigger sorting on the server-side (if needed)
-             const dataToSend = mergeObjects(sortedPickups, { [SORT_SIGNAL_KEY]: { Sort: true } });
-             uploadToGoogleSheet(dataToSend, url);
+            // --- Data Upload ---
+            // Add a special object to signal the end of data and trigger sorting on the server-side (if needed)
+            const dataToSend = mergeObjects(sortedPickups, { [SORT_SIGNAL_KEY]: { Sort: true } });
+            uploadToGoogleSheet(dataToSend, url);
 
         } catch (error) {
             console.error('Error processing file:', error);
@@ -227,7 +227,7 @@ const filterPickupData = (rowsArray) => {
             'Vehicle', // Deleted after extracting Rego
             'Items'    // Deleted after extracting Notes
         ];
-        
+
         // --- Process 'Vehicle' Column -> 'Rego (ready)' ---
         if (cleanedRow['Vehicle'] !== undefined) {
             let rego = String(cleanedRow['Vehicle']); // Ensure it's a string
@@ -235,12 +235,12 @@ const filterPickupData = (rowsArray) => {
             LOCATION_CODES.forEach((loc) => {
                 regp = snip(rego, loc);
             });
-            
+
             cleanedRow['Rego (ready)'] = rego;
         } else {
             cleanedRow['Rego (ready)'] = ''; // Ensure field exists even if Vehicle was missing
         }
-        
+
         // --- Process 'Arrival' Column ---
         if (typeof cleanedRow['Arrival'] === 'string') {
             if (cleanedRow['Arrival'].includes('No. Travelling')) {
@@ -251,35 +251,35 @@ const filterPickupData = (rowsArray) => {
                 cleanedRow['Arrival'] = '';
             }
         } else if (cleanedRow['Arrival'] === undefined || cleanedRow['Arrival'] === null) {
-             cleanedRow['Arrival'] = ''; // Ensure field is a string
-            }
-            
-            
-            // --- Process 'Items' Column -> 'Items / Notes' ---
-            if (cleanedRow['Items'] !== undefined) {
-                let notes = String(cleanedRow['Items']);
-                // Remove specific repetitive text and clean up spacing around parentheses
-                notes = snipSnap(notes, '- Universal '); // Remove "- Universal " globally
-                notes = notes.replace(/\)/g, ') ');     // Add space after closing parenthesis
-                cleanedRow['Items / Notes'] = notes.trim();
-            } else {
-                cleanedRow['Items / Notes'] = ''; // Ensure field exists
-            }
-            
-            columnsToDelete.forEach(colName => {
-                delete cleanedRow[colName];
-            });
+            cleanedRow['Arrival'] = ''; // Ensure field is a string
+        }
 
-            return cleanedRow;
+
+        // --- Process 'Items' Column -> 'Items / Notes' ---
+        if (cleanedRow['Items'] !== undefined) {
+            let notes = String(cleanedRow['Items']);
+            // Remove specific repetitive text and clean up spacing around parentheses
+            notes = snipSnap(notes, '- Universal '); // Remove "- Universal " globally
+            notes = notes.replace(/\)/g, ') ');     // Add space after closing parenthesis
+            cleanedRow['Items / Notes'] = notes.trim();
+        } else {
+            cleanedRow['Items / Notes'] = ''; // Ensure field exists
+        }
+
+        columnsToDelete.forEach(colName => {
+            delete cleanedRow[colName];
         });
-    };
-    
-    /**
-     * Adds sequential keys (based on a global counter) to an array of objects.
-     * Used before merging data from different sheets to ensure unique keys temporarily.
- * @param {Array<Object>} dataArray Array of data objects.
- * @returns {Object} Object where keys are sequential numbers and values are the data objects.
- */
+
+        return cleanedRow;
+    });
+};
+
+/**
+ * Adds sequential keys (based on a global counter) to an array of objects.
+ * Used before merging data from different sheets to ensure unique keys temporarily.
+* @param {Array<Object>} dataArray Array of data objects.
+* @returns {Object} Object where keys are sequential numbers and values are the data objects.
+*/
 const addSequentialKeys = (dataArray) => {
     const keyedObject = {};
     dataArray.forEach(item => {
@@ -303,7 +303,7 @@ const sortPickups = (pickupObject) => {
         // If 0 or 1 item, re-index and return directly
         const sorted = {};
         keys.forEach((key, index) => {
-           sorted[index] = { ...pickupObject[key], '#': index + 1 };
+            sorted[index] = { ...pickupObject[key], '#': index + 1 };
         });
         return sorted;
     }
@@ -402,7 +402,7 @@ const partitionKeys = (obj, keyList, pivotKey) => {
  * @param {Object} dataObject The final data object to upload, keyed sequentially.
  */
 const uploadToGoogleSheet = async (dataObject, url) => {
-    
+
     // Show loader
     if (loaderElement) loaderElement.style.display = 'flex';
     if (loaderPercentElement) loaderPercentElement.textContent = '0';
@@ -438,15 +438,15 @@ const uploadToGoogleSheet = async (dataObject, url) => {
             // Google Apps Script redirects often result in opaque responses if not configured for CORS,
             // so we might not get detailed success/failure info here without Apps Script changes.
             if (!response.ok && response.type !== 'opaque') {
-                 // Try to get error details if possible
+                // Try to get error details if possible
                 const errorText = await response.text();
-                 console.warn(`Warning: Fetch response not OK for row ${i + 1}. Status: ${response.status}. Details: ${errorText}`);
-                 // Decide if you want to stop the upload or continue
-                 // throw new Error(`Upload failed for row ${i + 1}: Status ${response.status}`);
+                console.warn(`Warning: Fetch response not OK for row ${i + 1}. Status: ${response.status}. Details: ${errorText}`);
+                // Decide if you want to stop the upload or continue
+                // throw new Error(`Upload failed for row ${i + 1}: Status ${response.status}`);
             }
-             // Update progress percentage
-             const percentComplete = Math.floor(((i + 1) / totalRows) * 100);
-             if (loaderPercentElement) loaderPercentElement.textContent = `${percentComplete}`;
+            // Update progress percentage
+            const percentComplete = Math.floor(((i + 1) / totalRows) * 100);
+            if (loaderPercentElement) loaderPercentElement.textContent = `${percentComplete}`;
 
 
         } catch (error) {
@@ -477,9 +477,14 @@ const uploadToGoogleSheet = async (dataObject, url) => {
  */
 const snip = (inputString, regexp, from = 0) => {
     // Ensure input is a string
-    const str = String(inputString);
-    const index = str.slice(from).search(regexp);
-    return (index === -1) ? str : str.slice(0, from + index); // Adjust index back relative to original string
+    const snip = (inputString, regexp, from = 0) => {
+        const index = inputString.slice(from).search(regexp);
+        if (index === -1) {
+            return inputString; // Return the original if nothing rlated was found
+        } else {
+            return inputString.slice(0, index) // Adjust index back relative to original string
+        }
+    }
 };
 
 /**
