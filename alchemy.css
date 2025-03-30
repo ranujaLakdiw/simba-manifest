@@ -1,0 +1,207 @@
+/* ======================================== */
+/* Global Styles & Variables                */
+/* ======================================== */
+
+/* Define color palette and other reusable values */
+:root {
+    --background-color: rgb(31, 31, 31);
+    --text-color-light: white;
+    --loader-background: black;
+    --shadow-color-dark: rgba(0, 0, 0, 0.392);
+    --shadow-color-light: white;
+    --font-primary: "Inconsolata", monospace;
+    --font-heading: "Bungee Tint", sans-serif;
+}
+
+body {
+    /* Use CSS variable for background color */
+    background-color: var(--background-color) !important;
+    /* !important likely needed to override Bootstrap theme */
+    /* Ensure body takes full viewport height */
+    min-height: 100vh;
+    width: 100%;
+    /* Flexbox properties to center content */
+    display: flex;
+    justify-content: center;
+    /* Center horizontally */
+    align-items: center;
+    /* Center vertically */
+    flex-wrap: wrap;
+    /* Allow content wrapping if needed */
+    /* Apply base font globally */
+    font-family: var(--font-primary);
+}
+
+/* ======================================== */
+/* Typography                             */
+/* ======================================== */
+
+/* Class for applying the primary font (Inconsolata) */
+/* Applied to body tag in HTML */
+.font {
+    font-family: var(--font-primary);
+    font-optical-sizing: auto;
+    font-weight: 300;
+    /* Light weight */
+    font-style: normal;
+    font-variation-settings: "wdth" 100;
+    /* Font specific setting */
+}
+
+/* Class for applying the heading font (Bungee Tint) */
+.topic {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    /* Regular weight */
+    font-style: normal;
+}
+
+/* ======================================== */
+/* Card Component                         */
+/* ======================================== */
+
+.card {
+    width: 500px;
+    /* Fixed width for the card */
+    /* Use variable for shadow, !important likely needed */
+    box-shadow: 0 10px 20px var(--shadow-color-dark) !important;
+    margin: 20px;
+    /* Spacing around the card */
+}
+
+/* Padding among .div in .card */
+.card div {
+    padding: 20px;
+}
+
+.card-title {
+    /* Override default card title color if needed */
+    color: var(--text-color-light) !important;
+}
+
+/* ======================================== */
+/* Button & Link Styles                   */
+/* ======================================== */
+
+button,
+a.btn {
+    /* Target buttons and anchor tags styled as Bootstrap buttons */
+    /* Smooth transition for hover/active states */
+    transition: all .2s ease-in;
+    /* Keeps an consistant width */
+    width: 120px;
+    /* Explicitly set initial shadow to none */
+    box-shadow: 0 0 0px var(--shadow-color-light);
+}
+
+button:hover,
+a.btn:hover {
+    /* Style on hover - white background might need !important for Bootstrap override */
+    background-color: var(--text-color-light) !important;
+    /* Add glow effect */
+    box-shadow: 0 .5px 10px var(--shadow-color-light);
+    /* Optionally change text color on hover if needed */
+    /* color: var(--background-color) !important; */
+}
+
+button:active,
+a.btn:active {
+    /* Style when clicked */
+    box-shadow: 0 0 12px var(--shadow-color-light);
+    /* Keep glow */
+    /* Slight movement effect */
+    transform: translateY(.5px);
+}
+
+/* ======================================== */
+/* Loader Styles                          */
+/* ======================================== */
+
+#loader {
+    /* Positioning for full-screen overlay */
+    position: fixed;
+    /* Use fixed to cover viewport regardless of scroll */
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    /* Use variable for background */
+    background-color: var(--loader-background);
+    /* Ensure loader is above other content */
+    z-index: 1000;
+    /* Flexbox to center loader content */
+    display: none;
+    /* Initially hidden, shown via JS */
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    /* Stack icon container and text vertically */
+    color: var(--text-color-light);
+    /* Set text color for loader */
+}
+
+/* Container for the icons inside the loader */
+.loader-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    /* Center icons horizontally */
+    align-items: center;
+    /* Align icons vertically */
+    flex-direction: row;
+    /* Arrange icons side-by-side */
+    padding: 20px;
+    /* Add some padding */
+}
+
+/* Spacing for icons within the loader */
+/* Corrected selector from .person to .man */
+#loader .man {
+    margin-right: 20px;
+    /* Space between man icon and dash */
+}
+
+#loader .database {
+    margin-left: 20px;
+    /* Space between dash and database icon */
+}
+
+/* Styling for the loading text */
+#loader .text {
+    font-size: 30px;
+    text-align: center;
+    padding: 10px 20px;
+    /* Vertical and horizontal padding */
+}
+
+/* Styling for the animated dash between icons */
+.dash {
+    width: 30%;
+    /* Adjust width as needed */
+    max-width: 150px;
+    /* Max width for larger screens */
+    height: 10px;
+    /* Reduced height */
+    /* Background gradient creates the dots */
+    /* White dots (#ffffff) fading to transparent (#00000000 or similar) */
+    background: radial-gradient(circle closest-side, var(--text-color-light) 90%, #73737300) 0 / calc(100%/5)
+        /* Size of each dot container (creates 5 dots) */
+        100%
+        /* Height of the gradient */
+        no-repeat;
+    /* Animation properties */
+    animation: l2 1s steps(5) infinite;
+}
+
+/* ======================================== */
+/* Animations                             */
+/* ======================================== */
+
+/* Keyframes for the loader dash animation */
+@keyframes l2 {
+
+    /* Moves the background position to cycle through the dots */
+    to {
+        background-position: 150%;
+    }
+}
