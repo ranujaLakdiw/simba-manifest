@@ -1,0 +1,100 @@
+body {
+    background-color: rgb(31, 31, 31) !important;
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.card {
+    width: 500px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.392) !important;
+    margin: 20px;
+}
+
+.card div {
+    padding: 20px;
+}
+
+.topic {
+    font-family: "Bungee Tint", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.font {
+    font-family: "Inconsolata", monospace;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+    font-variation-settings:
+        "wdth" 100;
+}
+
+button , a{
+    box-shadow: 0 0 0px white;
+    transition: all .05s linear !important;
+}
+
+button:hover, a:hover {
+    background-color: white !important;
+    box-shadow: 0 .5px 10px white;
+}
+
+.card-title {
+    color: white !important;
+}
+
+button:active, a:active {
+    background-color: transparent;
+    box-shadow: 0 0 10px white;
+    transform: translateY(.5px);
+}
+
+#loader {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-color: black;
+    z-index: 1000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.loader-container{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+#loader .text {
+    font-size: 30px;
+    padding-top: 20px;
+    text-align: center;
+    padding: 10px;
+}
+
+#loader .person {
+    margin-right: 10px;
+}
+
+#loader .database {
+    margin-left: 10px;
+}
+
+.dash {
+    width: 40%;
+    height: 20px;
+    /* margin-left: -5%; */
+    aspect-ratio: 4;
+    background: radial-gradient(circle closest-side,#ffffff 90%,#73737300) 0/calc(100%/5) 60% no-repeat;
+    animation: l2 1s steps(5) infinite;
+  }
+  @keyframes l2 {to{background-position: 150%}}
