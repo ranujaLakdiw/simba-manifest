@@ -76,7 +76,7 @@ let dropoffDataCounter = 0;
  * Sends alert messages
  * Haults every tasks until closed
  * @param {Text} txt The text that will appear in the alert body
- * @param {Boolean} success If the alert is a success message or not
+ * @param {Boolean} success If the alert is a success message or not, false on default
  */
 const alert = async (txt, success = false) => {
     const alert_box = document.querySelector(".alert");
@@ -87,6 +87,7 @@ const alert = async (txt, success = false) => {
     const alert_warning_emoji = document.querySelector("#warning-emoji");
     const alert_btn = document.querySelector(".alert-btn button");
 
+    // Display alert message. Check if it is a success message or not and display the relevant 
     alert_text.innerHTML = txt;
     if (success) {
         alert_success.style.display = "block";
@@ -100,6 +101,7 @@ const alert = async (txt, success = false) => {
     const btn_click = (btn) => {
         return new Promise((resolve) => {
             btn.addEventListener('click', (e) => {
+                // Remove alert on button click
                 alert_box.style.display = "none";
                 if (success) {
                     alert_success.style.display = "none";
@@ -110,6 +112,8 @@ const alert = async (txt, success = false) => {
                 }
                 alert_text.innerHTML = '';
                 resolve(e);
+
+                // Remove promise and event listener
             }, { once: true });
         });
     }
@@ -252,9 +256,6 @@ const processAndUploadFile = (file, pickup_url, dropoff_url, tomm = false) => {
                         throw new Error(`Wrong file format in sheet "${sheetName}".`);
                     }
 
-                    // Omit the last row which normally has daily total revenue information
-                    // const rowObject_sliced = Object.fromEntries(Object.entries(rowObject).slice(0, Object.keys(rowObject).length - 1));
-
                     // Filter and clean the data from the current sheet
                     const cleanedData = filterData(rowsArray, DROPOFF_SHEET_KEYWORD, tomm);
 
@@ -280,8 +281,7 @@ const processAndUploadFile = (file, pickup_url, dropoff_url, tomm = false) => {
         } catch (error) {
             console.error('Error processing file:', error);
             alert(`An error occurred while processing the file 😱: ${error.message}\nPlease check the console for details and ensure the file format is correct.`);
-            // Don't reload automatically.
-            // window.location.reload();
+
         }
     };
 
@@ -524,7 +524,7 @@ const uploadToGoogleSheet = async (pickups, dropoffs, pickup_url, dropoff_url) =
     console.log(`Starting upload of ${totalRows} rows...`);
 
     // Helper function for introducing delay
-    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    // const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
     const upload = async (dataObject, dataKeys, url) => {
 
@@ -573,9 +573,9 @@ const uploadToGoogleSheet = async (pickups, dropoffs, pickup_url, dropoff_url) =
     }
 
     // Uploading the pickup rows
-    // await upload(pickups, pickupKeys, pickup_url);
+    await upload(pickups, pickupKeys, pickup_url);
     // Uploading the dropoff rows
-    // await upload(dropoffs, dropoffKeys, dropoff_url);
+    await upload(dropoffs, dropoffKeys, dropoff_url);
 
     // --- Upload Completion ---
     console.log('Upload complete.');

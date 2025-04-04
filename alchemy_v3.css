@@ -189,6 +189,7 @@ a.btn:active {
 /* ALert Styles                             */
 /* ======================================== */
 
+/* Styles the main alert container: full-screen overlay, initially hidden, centered content */
 .alert {
     position: fixed !important;
     z-index: 1000;
@@ -203,6 +204,7 @@ a.btn:active {
     flex-direction: column;
 }
 
+/* Styles the main title text within the alert */
 .alert-topic {
     font-size: 70px;
     font-weight: 800;
@@ -213,6 +215,7 @@ a.btn:active {
     color: white;
 }
 
+/* Styles the container holding the message and animation area, arranging them horizontally */
 .alert-body {
     display: flex;
     justify-content: space-between;
@@ -223,6 +226,7 @@ a.btn:active {
     width: 100%;
 }
 
+/* Styles the container for the animation/graphic, taking half the width */
 .alert-animation {
     display: flex;
     width: 50%;
@@ -230,49 +234,61 @@ a.btn:active {
     align-items: center;
 }
 
+/* Styles the text message container, taking half the width */
 .alert-msg {
     font-size: 20px;
     font-weight: 500;
     width: 50%;
 }
 
+/* Styles the container for alert button(s) */
 .alert-btn {
     padding-left: 30px;
 }
 
+/* Default state for success-specific elements (initially hidden) */
 .success {
     display: none;
 }
 
+/* Default state for warning-specific elements (initially hidden) */
 .warning {
     display: none;
 }
 
+/* Default styles for the success emoji/icon container (hidden, specific background) */
 #success-emoji {
     display: none;
     background-color: rgb(2, 30, 0);
 }
 
+/* Default styles for the warning emoji/icon container (hidden, specific background) */
 #warning-emoji {
     display: none;
     background-color: rgb(30, 0, 0);
 }
 
+/* Positioning for a fireworks element, likely for animations */
 #fireworks{
     position: absolute;
     margin-bottom: 30px;
 }
 
+/* Responsive styles for screens 750px wide or less */
 @media screen and (max-width: 750px) {
+    /* Stacks the alert body items (message, animation) vertically on smaller screens */
     .alert-body {
         flex-direction: column;
     }
+    /* Reduces title font size on smaller screens */
     .alert-topic {
         font-size: 40px;
     }
+    /* Makes the message container full-width on smaller screens */
     .alert-msg {
         width: 100%;
     }
+    /* Makes the animation container full-width and adds padding on smaller screens */
     .alert-animation {
         width: 100%;
         padding: 40px;
