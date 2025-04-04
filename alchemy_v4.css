@@ -260,6 +260,8 @@ a.btn:active {
 #success-emoji {
     display: none;
     background-color: #088000;
+    padding-left: 10px;
+    padding-right: 25px;
     border-radius: 10px;
 }
 
@@ -267,7 +269,8 @@ a.btn:active {
 #warning-emoji {
     display: none;
     background-color: #880000;
-    padding: 5px;
+    padding-left: 10px;
+    padding-right: 25px;
     border-radius: 10px;
 }
 
