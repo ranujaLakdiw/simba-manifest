@@ -12,13 +12,16 @@
  * @const {string}
  */
 const SCRIPT_URL_TODAY = 'https://script.google.com/macros/s/AKfycbzSxOtxn7jQHq8kk-rPtJvxdqFWR7X1Qf4Mj_X1MlohwwkOB0QTk7aHYwvuedua_9J9/exec';
+const SCRIPT_URL_TODAY_DROPOFF = 'https://script.google.com/macros/s/AKfycbwvb1fMVmq61A-BqR9xRMw7N14aXWSn-1cfLEwF6a13padYMFcNZaL2em2dlmIa6Wic/exec';
 const SCRIPT_URL_TOMORROW = 'https://script.google.com/macros/s/AKfycbzObnQFgKhrVG0lefJqw6KFQmMD1ai23_3MRtk4eMApu1aJXhUTxN2RevYKejTmSK0S/exec';
+const SCRIPT_URL_TOMORROW_DROPOFF = SCRIPT_URL_TODAY_DROPOFF;
 
 /**
- * Keyword to identify sheets containing pickup data.
+ * Keyword to identify sheets containing pickup data abd dropoff data.
  * @const {string}
  */
 const PICKUP_SHEET_KEYWORD = 'Pick';
+const DROPOFF_SHEET_KEYWORD = 'Drop';
 
 /**
  * Column name used to validate the file format. Assumes this column must exist.
@@ -31,7 +34,7 @@ const VALIDATION_COLUMN = 'Res.';
  * Helps avoid overwhelming the Apps Script endpoint (rate limiting).
  * @const {number}
  */
-const UPLOAD_DELAY_MS = 0;
+const UPLOAD_DELAY_MS = 1500;
 
 /**
  * Key used for the special "Sort" signal object sent at the end.
@@ -66,6 +69,7 @@ let selectedFile;
  * @type {number}
  */
 let pickupDataCounter = 0;
+let dropoffDataCounter = 0;
 
 // --- Event Listeners ---
 
@@ -95,7 +99,7 @@ uploadButton.addEventListener('click', () => {
     }
 
     console.log(`Processing file: ${selectedFile.name}`);
-    processAndUploadFile(selectedFile, SCRIPT_URL_TODAY);
+    processAndUploadFile(selectedFile, SCRIPT_URL_TODAY, SCRIPT_URL_TODAY_DROPOFF);
 });
 
 uploadButtonTomm.addEventListener('click', () => {
@@ -105,7 +109,7 @@ uploadButtonTomm.addEventListener('click', () => {
     }
 
     console.log(`Processing file: ${selectedFile.name}`);
-    processAndUploadFile(selectedFile, SCRIPT_URL_TOMORROW);
+    processAndUploadFile(selectedFile, SCRIPT_URL_TOMORROW, SCRIPT_URL_TOMORROW_DROPOFF, true);
 });
 
 // --- Core Logic ---
@@ -115,7 +119,7 @@ uploadButtonTomm.addEventListener('click', () => {
  * sorts the data, and sends it to the Google Sheet.
  * @param {File} file The Excel file to process.
  */
-const processAndUploadFile = (file, url) => {
+const processAndUploadFile = (file, pickup_url, dropoff_url, tomm = false) => {
     const fileReader = new FileReader();
 
     // Configure the FileReader to read the file as an ArrayBuffer
@@ -145,14 +149,19 @@ const processAndUploadFile = (file, url) => {
             const hasPickupSheet = workbook.SheetNames.some(sheetName =>
                 sheetName.includes(PICKUP_SHEET_KEYWORD)
             );
+            const hasDropoffSheet = workbook.SheetNames.some(sheetName =>
+                sheetName.includes(DROPOFF_SHEET_KEYWORD)
+            );
 
-            if (!hasPickupSheet) {
+            if (!hasPickupSheet || !hasDropoffSheet) {
                 window.alert(`Are you sure you used the correct file (⊙_⊙;)? No "${PICKUP_SHEET_KEYWORD}" found.`);
                 return; // Stop processing
             }
 
             // --- Data Extraction and Processing ---
             let allPickups = {};
+            let allDropoffs = {};
+            dropoffDataCounter = 0;
             pickupDataCounter = 0; // Reset counter for each file upload
 
             workbook.SheetNames.forEach(sheetName => {
@@ -172,7 +181,7 @@ const processAndUploadFile = (file, url) => {
                     // const rowObject_sliced = Object.fromEntries(Object.entries(rowObject).slice(0, Object.keys(rowObject).length - 1));
 
                     // Filter and clean the data from the current sheet
-                    const cleanedData = filterPickupData(rowsArray);
+                    const cleanedData = filterData(rowsArray, PICKUP_SHEET_KEYWORD);
 
                     // Add unique keys to the cleaned data before merging
                     const keyedData = addSequentialKeys(cleanedData);
@@ -180,15 +189,42 @@ const processAndUploadFile = (file, url) => {
                     // Merge the processed data from this sheet into the main collection
                     allPickups = mergeObjects(allPickups, keyedData);
                 }
+                // Process only sheets identified as dropoff sheets
+                if (sheetName.includes(DROPOFF_SHEET_KEYWORD)) {
+
+                    // Convert sheet data to an array of row objects.
+                    // `range: 2` means "start reading data from row 3" (0-indexed is topic, 1-indexed is unrelated data, 2-indexed is header, 3 is data start).
+                    const rowsArray = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { range: 2, defval: "" }).slice(0, -1); // Using sheet_to_json
+
+                    // Validate format based on the first data row (if any)
+                    if (rowsArray.length > 0 && rowsArray[0][VALIDATION_COLUMN] === undefined) {
+                        throw new Error(`Wrong file format in sheet "${sheetName}".`);
+                    }
+
+                    // Omit the last row which normally has daily total revenue information
+                    // const rowObject_sliced = Object.fromEntries(Object.entries(rowObject).slice(0, Object.keys(rowObject).length - 1));
+
+                    // Filter and clean the data from the current sheet
+                    const cleanedData = filterData(rowsArray, DROPOFF_SHEET_KEYWORD, tomm);
+
+                    // Add unique keys to the cleaned data before merging
+                    const keyedData = addSequentialKeys(cleanedData);
+
+                    // Merge the processed data from this sheet into the main collection
+                    allDropoffs = mergeObjects(allDropoffs, keyedData);
+                }
+
             });
 
             // --- Sorting ---
-            const sortedPickups = sortPickups(allPickups); // Sorts and re-indexes with '#'
+            const sortedPickups = sortData(allPickups); // Sorts and re-indexes with '#'
+            const sortedDropoffs = sortData(allDropoffs); // Sorts and re-indexes with '#'
 
             // --- Data Upload ---
             // Add a special object to signal the end of data and trigger sorting on the server-side (if needed)
-            const dataToSend = mergeObjects(sortedPickups, { [SORT_SIGNAL_KEY]: { Sort: true } });
-            uploadToGoogleSheet(dataToSend, url);
+            const dataToSend_pickups = mergeObjects(sortedPickups, { [SORT_SIGNAL_KEY]: { Sort: true } });
+            const dataToSend_dropoffs = mergeObjects(sortedDropoffs, { [SORT_SIGNAL_KEY]: { Sort: true } });
+            uploadToGoogleSheet(dataToSend_pickups, dataToSend_dropoffs, pickup_url, dropoff_url);
 
         } catch (error) {
             console.error('Error processing file:', error);
@@ -213,45 +249,67 @@ const processAndUploadFile = (file, url) => {
  * @param {Array<Object>} rowsArray Array of row objects from the sheet.
  * @returns {Array<Object>} Array of cleaned row objects.
  */
-const filterPickupData = (rowsArray) => {
+const filterData = (rowsArray, sheet_name, tomm = false) => {
     return rowsArray.map(row => {
         // Create a copy to avoid modifying the original object if rowsArray is reused
         const cleanedRow = { ...row };
 
         // --- Remove Unnecessary Columns ---
         // List columns to delete for clarity
-        const columnsToDelete = [
-            '#', '# Days', 'Balance', 'Booked', 'Daily Rate', 'Day',
-            'Dropoff Date', 'Insurance', 'Rental Value', 'Checkin Completed',
-            'Pickup', 'Ref', 'Agent', // Note: Agent is deleted *after* potentially being used below (if needed in future)
-            'Vehicle', // Deleted after extracting Rego
-            'Items'    // Deleted after extracting Notes
-        ];
+        var columnsToDelete = [];
+        var regoRowName = 'Rego (ready)';
+        if (sheet_name == PICKUP_SHEET_KEYWORD) {
+            columnsToDelete = [
+                '#', '# Days', 'Balance', 'Booked', 'Daily Rate', 'Day',
+                'Dropoff Date', 'Insurance', 'Rental Value', 'Checkin Completed',
+                'Pickup', 'Ref', 'Agent', // Note: Agent is deleted *after* potentially being used below (if needed in future)
+                'Vehicle', // Deleted after extracting Rego
+                'Items'    // Deleted after extracting Notes
+            ];
+            // --- Process 'Arrival' Column ---
+            if (typeof cleanedRow['Arrival'] === 'string') {
+                if (cleanedRow['Arrival'].includes('No. Travelling')) {
+                    // Extract text after "No. Travelling: " (16 characters)
+                    cleanedRow['Arrival'] = cleanedRow['Arrival'].slice(16).trim();
+                } else if (cleanedRow['Arrival'].includes('N/A') || cleanedRow['Arrival'].includes('TBA')) {
+                    // Clear non-informative values
+                    cleanedRow['Arrival'] = '';
+                }
+            } else if (cleanedRow['Arrival'] === undefined || cleanedRow['Arrival'] === null) {
+                cleanedRow['Arrival'] = ''; // Ensure field is a string
+            }
+        } else {
+            columnsToDelete = [
+                '#', '# Days', 'Update', 'Notes', 'Daily Rate', 'Day',
+                'Pickup Date', 'Insurance', 'Rental Value',
+                'Dropoff', 'Departure', 'Next Rental', 'Ref',
+                'Vehicle', 'Balance', 'color', // Deleted after extracting Rego
+                'Items'    // Deleted after extracting Notes
+            ];
+            if (tomm) {
+                cleanedRow["Tomorrow"] = 'true';
+            }else{
+                cleanedRow["Tomorrow"] = 'false';
+            }
 
-        // --- Process 'Vehicle' Column -> 'Rego (ready)' ---
+            regoRowName = 'Rego';
+        }
+
+        // --- Process 'Vehicle' Column -> regoRowName ---
         if (cleanedRow['Vehicle'] !== undefined) {
             let rego = String(cleanedRow['Vehicle']); // Ensure it's a string
             // Remove location codes from the end of the string
-            LOCATION_CODES.forEach((loc) => {                
+            LOCATION_CODES.forEach((loc) => {
                 rego = snip(rego, loc);
             });
 
-            cleanedRow['Rego (ready)'] = rego;
+            cleanedRow[regoRowName] = rego;
         } else {
-            cleanedRow['Rego (ready)'] = ''; // Ensure field exists even if Vehicle was missing
-        }
-
-        // --- Process 'Arrival' Column ---
-        if (typeof cleanedRow['Arrival'] === 'string') {
-            if (cleanedRow['Arrival'].includes('No. Travelling')) {
-                // Extract text after "No. Travelling: " (16 characters)
-                cleanedRow['Arrival'] = cleanedRow['Arrival'].slice(16).trim();
-            } else if (cleanedRow['Arrival'].includes('N/A') || cleanedRow['Arrival'].includes('TBA')) {
-                // Clear non-informative values
-                cleanedRow['Arrival'] = '';
+            if (sheet_name == PICKUP_SHEET_KEYWORD) {
+            cleanedRow[regoRowName] = ''; // Ensure field exists even if Vehicle was missing
+            }else{
+                cleanedRow[regoRowName] = 'UNALLOCATED';
             }
-        } else if (cleanedRow['Arrival'] === undefined || cleanedRow['Arrival'] === null) {
-            cleanedRow['Arrival'] = ''; // Ensure field is a string
         }
 
 
@@ -297,7 +355,7 @@ const addSequentialKeys = (dataArray) => {
  * @param {Object} pickupObject Object containing pickup data keyed temporarily.
  * @returns {Object} Object containing sorted pickup data, keyed sequentially from 0, with '#' property added.
  */
-const sortPickups = (pickupObject) => {
+const sortData = (pickupObject) => {
     const keys = Object.keys(pickupObject);
     if (keys.length <= 1) {
         // If 0 or 1 item, re-index and return directly
@@ -401,66 +459,78 @@ const partitionKeys = (obj, keyList, pivotKey) => {
  * Uses async/await and a delay to manage the uploads sequentially.
  * @param {Object} dataObject The final data object to upload, keyed sequentially.
  */
-const uploadToGoogleSheet = async (dataObject, url) => {
+const uploadToGoogleSheet = async (pickups, dropoffs, pickup_url, dropoff_url) => {
 
     // Show loader
     if (loaderElement) loaderElement.style.display = 'flex';
     if (loaderPercentElement) loaderPercentElement.textContent = '0';
 
-    const dataKeys = Object.keys(dataObject);
-    const totalRows = dataKeys.length;
+    const pickupKeys = Object.keys(pickups);
+    const dropoffKeys = Object.keys(dropoffs);
+    const totalRows = pickupKeys.length + dropoffKeys.length;
+    var uploadedRows = 0;
 
     console.log(`Starting upload of ${totalRows} rows...`);
 
     // Helper function for introducing delay
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-    for (let i = 0; i < totalRows; i++) {
-        const key = dataKeys[i];
-        const rowData = dataObject[key];
-        const formData = new FormData();
+    const upload = async (dataObject, dataKeys, url) => {
 
-        // Populate FormData with the data for the current row
-        Object.keys(rowData).forEach((prop) => {
-            formData.append(prop, rowData[prop]);
-        });
+        for (let i = 0; i < dataKeys.length; i++) {
+            const key = dataKeys[i];
+            const rowData = dataObject[key];
+            const formData = new FormData();
 
-        try {
-            // Wait for the specified delay before sending the next request (except for the first one)
-            if (i > 0) {
-                await delay(UPLOAD_DELAY_MS);
+            // Populate FormData with the data for the current row
+            Object.keys(rowData).forEach((prop) => {
+                formData.append(prop, rowData[prop]);
+            });
+
+            try {
+                // Wait for the specified delay before sending the next request (except for the first one)
+                // if (i > 0) {
+                //     await delay(UPLOAD_DELAY_MS);
+                // }
+
+                console.log(`Uploading row ${uploadedRows + 1}/${totalRows} (Key: ${key})`);
+                // fetch(url, { method: 'POST', body: formData });
+                const response = await fetch(url, { method: 'POST', body: formData });
+                // Basic check if the request was successful (status 200-299)
+                // Google Apps Script redirects often result in opaque responses if not configured for CORS,
+                if (!response.ok && response.type !== 'opaque') {
+                    // Try to get error details if possible
+                    const errorText = await response.text();
+                    console.warn(`Warning: Fetch response not OK for row ${uploadedRows + 1}. Status: ${response.status}. Details: ${errorText}`);
+                    // Decide if you want to stop the upload or continue
+                    throw new Error(`Upload failed for row ${uploadedRows + 1}: Status ${response.status}`);
+                }
+
+                // Update progress percentage
+                uploadedRows += 1;
+                const percentComplete = Math.floor((uploadedRows / totalRows) * 100);
+                if (loaderPercentElement) loaderPercentElement.textContent = `${percentComplete}`;
+
+
+            } catch (error) {
+                console.error(`Error uploading row ${uploadedRows + 1} (Key: ${key}):`, error.message);
+                if (loaderElement) loaderElement.style.display = 'none'; // Hide loader on error
+                window.alert(`Error during upload at row ${uploadedRows + 1}: ${error.message} \nCheck console. Upload stopped.`);
+                return; // Stop the upload process
             }
-
-            console.log(`Uploading row ${i + 1}/${totalRows} (Key: ${key})`);
-            const response = await fetch(url, { method: 'POST', body: formData });
-
-            // Basic check if the request was successful (status 200-299)
-            // Google Apps Script redirects often result in opaque responses if not configured for CORS,
-            if (!response.ok && response.type !== 'opaque') {
-                // Try to get error details if possible
-                const errorText = await response.text();
-                console.warn(`Warning: Fetch response not OK for row ${i + 1}. Status: ${response.status}. Details: ${errorText}`);
-                // Decide if you want to stop the upload or continue
-                throw new Error(`Upload failed for row ${i + 1}: Status ${response.status}`);
-            }
-            // Update progress percentage
-            const percentComplete = Math.floor(((i + 1) / totalRows) * 100);
-            if (loaderPercentElement) loaderPercentElement.textContent = `${percentComplete}`;
-
-
-        } catch (error) {
-            console.error(`Error uploading row ${i + 1} (Key: ${key}):`, error.message);
-            if (loaderElement) loaderElement.style.display = 'none'; // Hide loader on error
-            window.alert(`Error during upload at row ${i + 1}: ${error.message} \nCheck console. Upload stopped.`);
-            return; // Stop the upload process
         }
     }
 
+    // Uploading the pickup rows
+    await upload(pickups, pickupKeys, pickup_url);
+    // Uploading the dropoff rows
+    await upload(dropoffs, dropoffKeys, dropoff_url);
+
     // --- Upload Completion ---
     console.log('Upload complete.');
+    window.alert('File submitted successfully! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧');
     if (loaderElement) loaderElement.style.display = 'none'; // Hide loader
     if (loaderPercentElement) loaderPercentElement.textContent = ''; // Clear percentage
-    window.alert('File submitted successfully! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧');
     window.location.reload(); // Reload the page after successful submission
 };
 

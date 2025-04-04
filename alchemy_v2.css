@@ -89,7 +89,7 @@ a.btn {
     /* Smooth transition for hover/active states */
     transition: all .2s ease-in;
     /* Keeps an consistant width */
-    width: 120px;
+    width: 180px;
     /* Explicitly set initial shadow to none */
     box-shadow: 0 0 0px var(--shadow-color-light);
 }
@@ -99,7 +99,7 @@ a.btn:hover {
     /* Style on hover - white background might need !important for Bootstrap override */
     background-color: var(--text-color-light) !important;
     /* Add glow effect */
-    box-shadow: 0 .5px 10px var(--shadow-color-light);
+    box-shadow: 0 .5px 7px var(--shadow-color-light);
     /* Optionally change text color on hover if needed */
     /* color: var(--background-color) !important; */
 }
@@ -158,17 +158,20 @@ a.btn:active {
 /* Corrected selector from .person to .man */
 #loader .man {
     margin-right: 20px;
+    overflow: hidden;
+    display: flex;
     /* Space between man icon and dash */
 }
 
 #loader .database {
-    margin-left: 20px;
+    overflow: hidden;
+    display: flex;
     /* Space between dash and database icon */
 }
 
 /* Styling for the loading text */
 #loader .text {
-    font-size: 30px;
+    font-size: 15px;
     text-align: center;
     padding: 10px 20px;
     /* Vertical and horizontal padding */
@@ -176,32 +179,8 @@ a.btn:active {
 
 /* Styling for the animated dash between icons */
 .dash {
-    width: 30%;
     /* Adjust width as needed */
-    max-width: 150px;
-    /* Max width for larger screens */
-    height: 10px;
-    /* Reduced height */
-    /* Background gradient creates the dots */
-    /* White dots (#ffffff) fading to transparent (#00000000 or similar) */
-    background: radial-gradient(circle closest-side, var(--text-color-light) 90%, #73737300) 0 / calc(100%/5)
-        /* Size of each dot container (creates 5 dots) */
-        100%
-        /* Height of the gradient */
-        no-repeat;
-    /* Animation properties */
-    animation: l2 1s steps(5) infinite;
-}
-
-/* ======================================== */
-/* Animations                             */
-/* ======================================== */
-
-/* Keyframes for the loader dash animation */
-@keyframes l2 {
-
-    /* Moves the background position to cycle through the dots */
-    to {
-        background-position: 150%;
-    }
+    /* max-width: 350px; */
+    overflow: hidden;
+    display: flex;
 }
