@@ -267,6 +267,7 @@ a.btn:active {
 #warning-emoji {
     display: none;
     background-color: #880000;
+    padding: 5px;
     border-radius: 10px;
 }
 
