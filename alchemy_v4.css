@@ -259,13 +259,15 @@ a.btn:active {
 /* Default styles for the success emoji/icon container (hidden, specific background) */
 #success-emoji {
     display: none;
-    background-color: rgb(2, 30, 0);
+    background-color: #088000;
+    border-radius: 10px;
 }
 
 /* Default styles for the warning emoji/icon container (hidden, specific background) */
 #warning-emoji {
     display: none;
-    background-color: rgb(30, 0, 0);
+    background-color: #880000;
+    border-radius: 10px;
 }
 
 /* Positioning for a fireworks element, likely for animations */
