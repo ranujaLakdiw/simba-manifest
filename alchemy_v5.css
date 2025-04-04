@@ -189,7 +189,7 @@ a.btn:active {
 
 /* Styles the main alert container: full-screen overlay, initially hidden, centered content */
 .alert {
-    position: absolute !important;
+    position: fixed !important;
     z-index: 1000;
     height: 100%;
     min-height: 630px;
@@ -307,5 +307,11 @@ a.btn:active {
     }
     .alert-btn {
         padding: 0;
+    }
+}
+
+@media screen and (max-height: 630px) {
+    .alert {
+        position: absolute !important;
     }
 }
