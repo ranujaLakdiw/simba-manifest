@@ -128,7 +128,7 @@ a.btn:active {
     /* Use variable for background */
     background-color: var(--loader-background);
     /* Ensure loader is above other content */
-    z-index: 1000;
+    z-index: 500;
     /* Flexbox to center loader content */
     display: none;
     /* Initially hidden, shown via JS */
@@ -183,4 +183,98 @@ a.btn:active {
     /* max-width: 350px; */
     overflow: hidden;
     display: flex;
+}
+
+/* ======================================== */
+/* ALert Styles                             */
+/* ======================================== */
+
+.alert {
+    position: fixed !important;
+    z-index: 1000;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.793) !important;
+    backdrop-filter: blur(40px);
+    padding: 10% !important;
+    display: none;
+    justify-content: center;
+    /* flex-wrap: wrap; */
+    flex-direction: column;
+}
+
+.alert-topic {
+    font-size: 70px;
+    font-weight: 800;
+    padding: 30px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    color: white;
+}
+
+.alert-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+    color: white;
+    padding-left: 30px;
+    width: 100%;
+}
+
+.alert-animation {
+    display: flex;
+    width: 50%;
+    justify-content: center;
+    align-items: center;
+}
+
+.alert-msg {
+    font-size: 20px;
+    font-weight: 500;
+    width: 50%;
+}
+
+.alert-btn {
+    padding-left: 30px;
+}
+
+.success {
+    display: none;
+}
+
+.warning {
+    display: none;
+}
+
+#success-emoji {
+    display: none;
+    background-color: rgb(2, 30, 0);
+}
+
+#warning-emoji {
+    display: none;
+    background-color: rgb(30, 0, 0);
+}
+
+#fireworks{
+    position: absolute;
+    margin-bottom: 30px;
+}
+
+@media screen and (max-width: 750px) {
+    .alert-body {
+        flex-direction: column;
+    }
+    .alert-topic {
+        font-size: 40px;
+    }
+    .alert-msg {
+        width: 100%;
+    }
+    .alert-animation {
+        width: 100%;
+        padding: 40px;
+    }
 }

@@ -71,6 +71,54 @@ let selectedFile;
 let pickupDataCounter = 0;
 let dropoffDataCounter = 0;
 
+//--- Alert Function ---
+/**
+ * Sends alert messages
+ * Haults every tasks until closed
+ * @param {Text} txt The text that will appear in the alert body
+ * @param {Boolean} success If the alert is a success message or not
+ */
+const alert = async (txt, success = false) => {
+    const alert_box = document.querySelector(".alert");
+    const alert_text = document.querySelector(".alert-msg");
+    const alert_success = document.querySelector(".success");
+    const alert_success_emoji = document.querySelector("#success-emoji");
+    const alert_warning = document.querySelector(".warning");
+    const alert_warning_emoji = document.querySelector("#warning-emoji");
+    const alert_btn = document.querySelector(".alert-btn button");
+
+    alert_text.innerHTML = txt;
+    if (success) {
+        alert_success.style.display = "block";
+        alert_success_emoji.style.display = "block";
+    } else {
+        alert_warning.style.display = "block";
+        alert_warning_emoji.style.display = "block";
+    }
+    alert_box.style.display = "flex";
+
+    const btn_click = (btn) => {
+        return new Promise((resolve) => {
+            btn.addEventListener('click', (e) => {
+                alert_box.style.display = "none";
+                if (success) {
+                    alert_success.style.display = "none";
+                    alert_success_emoji.style.display = "none";
+                } else {
+                    alert_warning.style.display = "none";
+                    alert_warning_emoji.style.display = "none";
+                }
+                alert_text.innerHTML = '';
+                resolve(e);
+            }, { once: true });
+        });
+    }
+    alert_btn.focus();
+    await btn_click(alert_btn);
+    
+    
+}
+
 // --- Event Listeners ---
 
 /**
@@ -81,7 +129,7 @@ fileInput.addEventListener('change', (event) => {
     // Get the most recently selected file in case multiple were somehow selected
     if (event.target.files && event.target.files.length > 0) {
         selectedFile = event.target.files[event.target.files.length - 1];
-        console.log('File selected:', selectedFile.name);
+        console.log('📃 File selected:', selectedFile.name);
     } else {
         selectedFile = undefined;
         console.log('File selection cleared.');
@@ -94,7 +142,7 @@ fileInput.addEventListener('change', (event) => {
  */
 uploadButton.addEventListener('click', () => {
     if (!selectedFile) {
-        window.alert('Select the file first! .....(╬▔皿▔)╯ (or just go to sheet)');
+        alert('🤦‍♀️ Select the file first! ..... (or just go to sheet)');
         return;
     }
 
@@ -104,13 +152,16 @@ uploadButton.addEventListener('click', () => {
 
 uploadButtonTomm.addEventListener('click', () => {
     if (!selectedFile) {
-        window.alert('Select the file first! .....(╬▔皿▔)╯ (or just go to sheet)');
+        alert('😤 Select the file first! ..... (or just go to sheet)');
         return;
     }
 
-    console.log(`Processing file: ${selectedFile.name}`);
+    console.log(`⚙️ Processing file: ${selectedFile.name}`);
     processAndUploadFile(selectedFile, SCRIPT_URL_TOMORROW, SCRIPT_URL_TOMORROW_DROPOFF, true);
 });
+
+
+
 
 // --- Core Logic ---
 
@@ -154,7 +205,7 @@ const processAndUploadFile = (file, pickup_url, dropoff_url, tomm = false) => {
             );
 
             if (!hasPickupSheet || !hasDropoffSheet) {
-                window.alert(`Are you sure you used the correct file (⊙_⊙;)? No "${PICKUP_SHEET_KEYWORD}" found.`);
+                alert(`🧐 Are you sure you used the correct file? No "${PICKUP_SHEET_KEYWORD}" found.`);
                 return; // Stop processing
             }
 
@@ -228,7 +279,7 @@ const processAndUploadFile = (file, pickup_url, dropoff_url, tomm = false) => {
 
         } catch (error) {
             console.error('Error processing file:', error);
-            window.alert(`An error occurred while processing the file: ${error.message}\nPlease check the console for details and ensure the file format is correct.`);
+            alert(`An error occurred while processing the file 😱: ${error.message}\nPlease check the console for details and ensure the file format is correct.`);
             // Don't reload automatically.
             // window.location.reload();
         }
@@ -237,7 +288,7 @@ const processAndUploadFile = (file, pickup_url, dropoff_url, tomm = false) => {
     // Define error handling for the FileReader itself
     fileReader.onerror = (error) => {
         console.error('Error reading file:', error);
-        window.alert('Could not read the selected file. Please ensure it is not corrupted and try again.');
+        alert('Could not read the selected file 🥸. Please ensure it is not corrupted and try again.');
     };
 };
 
@@ -288,7 +339,7 @@ const filterData = (rowsArray, sheet_name, tomm = false) => {
             ];
             if (tomm) {
                 cleanedRow["Tomorrow"] = 'true';
-            }else{
+            } else {
                 cleanedRow["Tomorrow"] = 'false';
             }
 
@@ -306,8 +357,8 @@ const filterData = (rowsArray, sheet_name, tomm = false) => {
             cleanedRow[regoRowName] = rego;
         } else {
             if (sheet_name == PICKUP_SHEET_KEYWORD) {
-            cleanedRow[regoRowName] = ''; // Ensure field exists even if Vehicle was missing
-            }else{
+                cleanedRow[regoRowName] = ''; // Ensure field exists even if Vehicle was missing
+            } else {
                 cleanedRow[regoRowName] = 'UNALLOCATED';
             }
         }
@@ -513,22 +564,22 @@ const uploadToGoogleSheet = async (pickups, dropoffs, pickup_url, dropoff_url) =
 
 
             } catch (error) {
-                console.error(`Error uploading row ${uploadedRows + 1} (Key: ${key}):`, error.message);
+                console.error(`🥸 Error uploading row ${uploadedRows + 1} (Key: ${key}):`, error.message);
                 if (loaderElement) loaderElement.style.display = 'none'; // Hide loader on error
-                window.alert(`Error during upload at row ${uploadedRows + 1}: ${error.message} \nCheck console. Upload stopped.`);
+                alert(`😱 Error during upload at row ${uploadedRows + 1}: ${error.message} \nCheck console. Upload stopped.`);
                 return; // Stop the upload process
             }
         }
     }
 
     // Uploading the pickup rows
-    await upload(pickups, pickupKeys, pickup_url);
+    // await upload(pickups, pickupKeys, pickup_url);
     // Uploading the dropoff rows
-    await upload(dropoffs, dropoffKeys, dropoff_url);
+    // await upload(dropoffs, dropoffKeys, dropoff_url);
 
     // --- Upload Completion ---
     console.log('Upload complete.');
-    window.alert('File submitted successfully! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧');
+    await alert('File submitted successfully! 😎', true);
     if (loaderElement) loaderElement.style.display = 'none'; // Hide loader
     if (loaderPercentElement) loaderPercentElement.textContent = ''; // Clear percentage
     window.location.reload(); // Reload the page after successful submission
