@@ -12,7 +12,7 @@
  * @const {string}
  */
 const SCRIPT_URL_TODAY = 'https://script.google.com/macros/s/AKfycbzSxOtxn7jQHq8kk-rPtJvxdqFWR7X1Qf4Mj_X1MlohwwkOB0QTk7aHYwvuedua_9J9/exec';
-const SCRIPT_URL_TODAY_DROPOFF = 'https://script.google.com/macros/s/AKfycbwvb1fMVmq61A-BqR9xRMw7N14aXWSn-1cfLEwF6a13padYMFcNZaL2em2dlmIa6Wic/exec';
+const SCRIPT_URL_TODAY_DROPOFF = SCRIPT_URL_TODAY;
 const SCRIPT_URL_TOMORROW = 'https://script.google.com/macros/s/AKfycbzObnQFgKhrVG0lefJqw6KFQmMD1ai23_3MRtk4eMApu1aJXhUTxN2RevYKejTmSK0S/exec';
 const SCRIPT_URL_TOMORROW_DROPOFF = SCRIPT_URL_TODAY_DROPOFF;
 
@@ -119,8 +119,8 @@ const alert = async (txt, success = false) => {
     }
     alert_btn.focus();
     await btn_click(alert_btn);
-    
-    
+
+
 }
 
 // --- Event Listeners ---
@@ -236,7 +236,7 @@ const processAndUploadFile = (file, pickup_url, dropoff_url, tomm = false) => {
                     // const rowObject_sliced = Object.fromEntries(Object.entries(rowObject).slice(0, Object.keys(rowObject).length - 1));
 
                     // Filter and clean the data from the current sheet
-                    const cleanedData = filterData(rowsArray, PICKUP_SHEET_KEYWORD);
+                    const cleanedData = filterData(rowsArray, PICKUP_SHEET_KEYWORD, tomm);
 
                     // Add unique keys to the cleaned data before merging
                     const keyedData = addSequentialKeys(cleanedData);
@@ -337,13 +337,14 @@ const filterData = (rowsArray, sheet_name, tomm = false) => {
                 'Vehicle', 'Balance', 'color', // Deleted after extracting Rego
                 'Items'    // Deleted after extracting Notes
             ];
-            if (tomm) {
-                cleanedRow["Tomorrow"] = 'true';
-            } else {
-                cleanedRow["Tomorrow"] = 'false';
-            }
 
             regoRowName = 'Rego';
+        }
+
+        if (tomm) {
+            cleanedRow["Tomorrow"] = 'true';
+        } else {
+            cleanedRow["Tomorrow"] = 'false';
         }
 
         // --- Process 'Vehicle' Column -> regoRowName ---
