@@ -196,7 +196,7 @@ a.btn:active {
     width: 100%;
     min-width: 305px;
     top: 0;
-    background-color: rgba(0, 0, 0, 0.319) !important;
+    background-color: rgba(0, 0, 0, 0.077) !important;
     backdrop-filter: blur(40px);
     display: none;
     justify-content: center;
@@ -206,17 +206,19 @@ a.btn:active {
 }
 
 .alert-box {
+    font-weight: 450;
     background-color: rgb(255, 255, 255);
     backdrop-filter: blur(50px);
     padding: 30px;
     border-radius: 30px;
-    width: 40%;
+    width: 40%;    
+    border: 3px solid black;
 }
 
 /* Styles the main title text within the alert */
 .alert-topic {
     font-size: 40px;
-    font-weight: 500;
+    font-weight: 600;
     padding: 10px;
     width: 100%;
     display: flex;
@@ -269,6 +271,7 @@ a.btn:active {
 /* Default state for success-specific elements (initially hidden) */
 .success {
     display: none;
+
 }
 
 /* Default state for warning-specific elements (initially hidden) */
@@ -284,7 +287,7 @@ a.btn:active {
     padding-left: 10px;
     padding-right: 25px;
     border-radius: 10px;
-
+    border: 3px solid black;
 }
 
 /* Default styles for the warning emoji/icon container (hidden, specific background) */
@@ -295,6 +298,7 @@ a.btn:active {
     padding-left: 10px;
     padding-right: 25px;
     border-radius: 10px;
+    border: 3px solid black;
 }
 
 /* Positioning for a fireworks element, likely for animations */
@@ -362,13 +366,16 @@ a.btn:active {
     .alert-topic {
         transform: translate(-60px, -85px);
     }
+
     #success-emoji {
         padding-left: 10px;
         padding-right: 10px;
     }
+
     .warning img {
         width: 250px !important;
     }
+
     .success dotlottie-player {
         width: 180px;
         height: 180px;
@@ -384,15 +391,25 @@ a.btn:active {
 @keyframes shake {
     0% {
         transform: translateY(0);
-    }20% {
+    }
+
+    20% {
         transform: translateY(-10px);
-    }40% {
+    }
+
+    40% {
         transform: translateY(8px);
-    }60% {
+    }
+
+    60% {
         transform: translateY(-5px);
-    }80% {
+    }
+
+    80% {
         transform: translateY(3px);
-    }100% {
+    }
+
+    100% {
         transform: translateY(0);
     }
 }
