@@ -5,7 +5,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="logo.svg" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="alchemy_v5.css">
+    <link rel="stylesheet" href="alchemy_v6.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
@@ -21,44 +21,46 @@
 
 <body class="font">
 
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <!-- Toast template commented for further use in future. -->
+
+    <!-- <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <div class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay='6000'>
             <div class="toast-header">
                 <strong class="me-auto">📢 New Update</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body">
-                * "<b><i>Cancelled</i></b>", now an option in Pickup List.<br /><br />
-                * You are able to upload dropoff lists📃 now.
+                Toast text here.
             </div>
         </div>
-    </div>
+    </div> -->
 
     <div class="alert">
-        <div class="alert-topic">
-            <span id="warning-emoji">⚠️ Alert</span><span id="success-emoji">🥂 Success</span>
-        </div>
-        <div class="alert-body">
-            <div class="alert-msg"></div>
-            <div class="alert-animation">
-                <div class="success">
-                    <dotlottie-player id="fireworks"
-                        src="https://lottie.host/b324e2e6-8904-433f-8e21-a3fc444a6508/8s8lRkbvgs.lottie"
-                        background="transparent" speed="1" style="width: 300px; height: 300px" loop
-                        autoplay></dotlottie-player>
-                    <dotlottie-player src="https://lottie.host/c0891c78-3279-45d7-9c05-129c8e55130e/yK9vtHq8p0.lottie"
-                        background="transparent" speed="1" style="width: 300px; height: 300px" loop
-                        autoplay></dotlottie-player>
-                </div>
-                <div class="warning">
-                    <dotlottie-player src="https://lottie.host/33cc61c8-069b-4d69-8404-3a12a390aa97/FLPJjmFIux.lottie"
-                        background="transparent" speed="1" style="width: 300px; height: 300px" loop
-                        autoplay></dotlottie-player>
+        <div class="alert-box">
+            <div class="alert-topic">
+                <span id="warning-emoji">⚠️ Alert</span><span id="success-emoji">🎉 Success</span>
+            </div>
+            <div class="alert-body">
+                <div class="alert-msg"></div>
+                <div class="alert-animation">
+                    <div class="success">
+                        <dotlottie-player id="fireworks"
+                            src="https://lottie.host/b324e2e6-8904-433f-8e21-a3fc444a6508/8s8lRkbvgs.lottie"
+                            background="transparent" speed="1" style="width: 217px; height: 217px" loop
+                            autoplay></dotlottie-player>
+                        <dotlottie-player
+                            src="https://lottie.host/c0891c78-3279-45d7-9c05-129c8e55130e/yK9vtHq8p0.lottie"
+                            background="transparent" speed="1" style="width: 217px; height: 217px" loop
+                            autoplay></dotlottie-player>
+                    </div>
+                    <div class="warning">
+                        <img src="warn.png" alt="https://www.freepik.com/free-vector/tiny-people-examining-operating-system-error-warning-web-page-isolated-flat-illustration_11235921.htm" width="300"/>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="alert-btn">
-            <button type="button" class="card-link btn btn-light" id="alert-btn">Okay</button>
+            <div class="alert-btn">
+                <button type="button" class="card-link btn btn-light" id="alert-btn">Okay</button>
+            </div>
         </div>
     </div>
 
@@ -119,12 +121,15 @@
         integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
         crossorigin="anonymous"></script>
     <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
-    <script src="manifestWrangler_v4.js"></script>
-    <script>
+    <script src="manifestWrangler_v6.js"></script>
+
+    <!-- Toast trigger -->
+
+    <!-- <script>
         const toast = document.querySelector('.toast');
         const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toast);
         toastBootstrap.show();
-    </script>
+    </script> -->
 </body>
 
 

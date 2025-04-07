@@ -1,8 +1,8 @@
 /**
  * @fileoverview Script to handle Excel file upload, process pickup data,
  * sort it, and send it row by row to a Google Apps Script endpoint.
- * @version 1.0.0
- * @author Your Name / Lakdiw
+ * @version 6.0.0
+ * @author Ranuja Lakdiw
  */
 
 // --- Configuration ---
@@ -12,8 +12,8 @@
  * @const {string}
  */
 const SCRIPT_URL_TODAY = 'https://script.google.com/macros/s/AKfycbzSxOtxn7jQHq8kk-rPtJvxdqFWR7X1Qf4Mj_X1MlohwwkOB0QTk7aHYwvuedua_9J9/exec';
-const SCRIPT_URL_TODAY_DROPOFF = SCRIPT_URL_TODAY;
-const SCRIPT_URL_TOMORROW = 'https://script.google.com/macros/s/AKfycbzObnQFgKhrVG0lefJqw6KFQmMD1ai23_3MRtk4eMApu1aJXhUTxN2RevYKejTmSK0S/exec';
+const SCRIPT_URL_TODAY_DROPOFF = 'https://script.google.com/macros/s/AKfycbwvb1fMVmq61A-BqR9xRMw7N14aXWSn-1cfLEwF6a13padYMFcNZaL2em2dlmIa6Wic/exec';
+const SCRIPT_URL_TOMORROW = SCRIPT_URL_TODAY;
 const SCRIPT_URL_TOMORROW_DROPOFF = SCRIPT_URL_TODAY_DROPOFF;
 
 /**
@@ -79,7 +79,8 @@ let dropoffDataCounter = 0;
  * @param {Boolean} success If the alert is a success message or not, false on default
  */
 const alert = async (txt, success = false) => {
-    const alert_box = document.querySelector(".alert");
+    const alert_container = document.querySelector(".alert");
+    const alert_box = document.querySelector(".alert-box");
     const alert_text = document.querySelector(".alert-msg");
     const alert_success = document.querySelector(".success");
     const alert_success_emoji = document.querySelector("#success-emoji");
@@ -95,20 +96,22 @@ const alert = async (txt, success = false) => {
     } else {
         alert_warning.style.display = "block";
         alert_warning_emoji.style.display = "block";
+        alert_box.style.animation = "shake .3s linear";
     }
-    alert_box.style.display = "flex";
-
+    alert_container.style.display = "flex";
+    
     const btn_click = (btn) => {
         return new Promise((resolve) => {
             btn.addEventListener('click', (e) => {
                 // Remove alert on button click
-                alert_box.style.display = "none";
+                alert_container.style.display = "none";
                 if (success) {
                     alert_success.style.display = "none";
                     alert_success_emoji.style.display = "none";
                 } else {
                     alert_warning.style.display = "none";
                     alert_warning_emoji.style.display = "none";
+                    alert_box.style.animation = "";
                 }
                 alert_text.innerHTML = '';
                 resolve(e);

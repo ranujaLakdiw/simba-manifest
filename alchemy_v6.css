@@ -196,24 +196,33 @@ a.btn:active {
     width: 100%;
     min-width: 305px;
     top: 0;
-    background-color: rgba(0, 0, 0, 0.793) !important;
+    background-color: rgba(0, 0, 0, 0.319) !important;
     backdrop-filter: blur(40px);
-    padding: 10% !important;
     display: none;
     justify-content: center;
+    align-items: center;
     flex-direction: column;
     margin: 0 !important;
 }
 
+.alert-box {
+    background-color: rgb(255, 255, 255);
+    backdrop-filter: blur(50px);
+    padding: 30px;
+    border-radius: 30px;
+    width: 40%;
+}
+
 /* Styles the main title text within the alert */
 .alert-topic {
-    font-size: 70px;
-    font-weight: 800;
-    padding: 30px;
+    font-size: 40px;
+    font-weight: 500;
+    padding: 10px;
     width: 100%;
     display: flex;
     flex-direction: row;
-    color: white;
+    position: absolute;
+    transform: translateY(-70px);
 }
 
 /* Styles the container holding the message and animation area, arranging them horizontally */
@@ -222,7 +231,7 @@ a.btn:active {
     justify-content: space-between;
     align-items: center;
     flex-direction: row;
-    color: white;
+    color: black;
     padding-left: 30px;
     width: 100%;
 }
@@ -237,14 +246,24 @@ a.btn:active {
 
 /* Styles the text message container, taking half the width */
 .alert-msg {
-    font-size: 20px;
-    font-weight: 500;
+    font-size: 15px;
     width: 50%;
 }
 
 /* Styles the container for alert button(s) */
 .alert-btn {
     padding-left: 30px;
+}
+
+.alert-btn button {
+    background-color: black;
+    color: white;
+    border-width: 2px;
+    border-color: black;
+}
+
+.alert-btn button:hover {
+    border-color: black;
 }
 
 /* Default state for success-specific elements (initially hidden) */
@@ -260,25 +279,44 @@ a.btn:active {
 /* Default styles for the success emoji/icon container (hidden, specific background) */
 #success-emoji {
     display: none;
-    background-color: #088000;
+    background-color: #7FBD7A;
+    color: rgb(1, 34, 3);
     padding-left: 10px;
     padding-right: 25px;
     border-radius: 10px;
+
 }
 
 /* Default styles for the warning emoji/icon container (hidden, specific background) */
 #warning-emoji {
     display: none;
-    background-color: #880000;
+    background-color: #C17B7B;
+    color: #440202;
     padding-left: 10px;
     padding-right: 25px;
     border-radius: 10px;
 }
 
 /* Positioning for a fireworks element, likely for animations */
-#fireworks{
+#fireworks {
     position: absolute;
     margin-bottom: 30px;
+}
+
+/* Responsive styles for screens 1750px wide or less */
+@media screen and (max-width: 1750px) {
+    .alert-box {
+        width: 60%;
+    }
+
+}
+
+/* Responsive styles for screens 1100px wide or less */
+@media screen and (max-width: 1100px) {
+    .alert-box {
+        width: 80%;
+    }
+
 }
 
 /* Responsive styles for screens 750px wide or less */
@@ -286,32 +324,75 @@ a.btn:active {
     .alert {
         padding: 10px !important;
     }
+
+    .alert-box {
+        padding-top: 40px;
+    }
+
     /* Stacks the alert body items (message, animation) vertically on smaller screens */
     .alert-body {
         flex-direction: column;
         padding: 0;
     }
+
     /* Reduces title font size on smaller screens */
     .alert-topic {
         font-size: 40px;
-        padding-left: 0;
+        transform: translateY(-85px);
+
     }
+
     /* Makes the message container full-width on smaller screens */
     .alert-msg {
         width: 100%;
     }
+
     /* Makes the animation container full-width and adds padding on smaller screens */
     .alert-animation {
         width: 100%;
         padding: 40px;
     }
+
     .alert-btn {
         padding: 0;
+    }
+}
+
+@media screen and (max-width: 450px) {
+    .alert-topic {
+        transform: translate(-60px, -85px);
+    }
+    #success-emoji {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .warning img {
+        width: 250px !important;
+    }
+    .success dotlottie-player {
+        width: 180px;
+        height: 180px;
     }
 }
 
 @media screen and (max-height: 630px) {
     .alert {
         position: absolute !important;
+    }
+}
+
+@keyframes shake {
+    0% {
+        transform: translateY(0);
+    }20% {
+        transform: translateY(-10px);
+    }40% {
+        transform: translateY(8px);
+    }60% {
+        transform: translateY(-5px);
+    }80% {
+        transform: translateY(3px);
+    }100% {
+        transform: translateY(0);
     }
 }
