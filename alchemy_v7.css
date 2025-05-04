@@ -130,7 +130,7 @@ a.btn:active {
     /* Ensure loader is above other content */
     z-index: 500;
     /* Flexbox to center loader content */
-    display: none;
+    display: flex;
     /* Initially hidden, shown via JS */
     justify-content: center;
     align-items: center;
@@ -187,6 +187,7 @@ a.btn:active {
 .dash {
     /* Adjust width as needed */
     display: flex;
+    overflow: hidden;
 }
 
 /* ======================================== */
