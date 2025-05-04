@@ -130,7 +130,7 @@ a.btn:active {
     /* Ensure loader is above other content */
     z-index: 500;
     /* Flexbox to center loader content */
-    display: none;
+    display: flex;
     /* Initially hidden, shown via JS */
     justify-content: center;
     align-items: center;
@@ -176,6 +176,13 @@ a.btn:active {
     padding: 10px 20px;
     /* Vertical and horizontal padding */
 }
+
+#loading-bar {
+    box-shadow: 0 0 13px white;
+    width: 60%;
+    background: linear-gradient(to right, #044252, #09ff00);    
+}
+
 
 /* Styling for the animated dash between icons */
 .dash {

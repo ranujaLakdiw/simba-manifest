@@ -54,6 +54,7 @@ const fileInput = document.getElementById('input');
 const uploadButton = document.getElementById('upload');
 const uploadButtonTomm = document.getElementById('upload-tomm');
 const loaderElement = document.getElementById('loader');
+const loaderBar = document.getElementById('loading-bar');
 const loaderPercentElement = document.getElementById('loader-perct');
 
 // --- State ---
@@ -518,7 +519,8 @@ const uploadToGoogleSheet = async (pickups, dropoffs, pickup_url, dropoff_url) =
 
     // Show loader
     if (loaderElement) loaderElement.style.display = 'flex';
-    if (loaderPercentElement) loaderPercentElement.textContent = '0';
+    if (loaderPercentElement) loaderPercentElement.textContent = '000';
+    if (loaderBar) loaderBar.style.width = '0%';
 
     const pickupKeys = Object.keys(pickups);
     const dropoffKeys = Object.keys(dropoffs);
@@ -564,7 +566,11 @@ const uploadToGoogleSheet = async (pickups, dropoffs, pickup_url, dropoff_url) =
                 // Update progress percentage
                 uploadedRows += 1;
                 const percentComplete = Math.floor((uploadedRows / totalRows) * 100);
-                if (loaderPercentElement) loaderPercentElement.textContent = `${percentComplete}`;
+                let p = percentComplete;
+                if (loaderBar) loaderBar.style.width = `${percentComplete}%`;
+                if (percentComplete < 10) p = `00${percentComplete}` 
+                else if (percentComplete < 100) p = `0${percentComplete}` 
+                if (loaderPercentElement) loaderPercentElement.textContent = `${p}`;
 
 
             } catch (error) {
@@ -586,6 +592,7 @@ const uploadToGoogleSheet = async (pickups, dropoffs, pickup_url, dropoff_url) =
     await alert('File submitted successfully! 😎', true);
     if (loaderElement) loaderElement.style.display = 'none'; // Hide loader
     if (loaderPercentElement) loaderPercentElement.textContent = ''; // Clear percentage
+    if (loaderBar) loaderBar.style.width = '0%';
     window.location.reload(); // Reload the page after successful submission
 };
 
