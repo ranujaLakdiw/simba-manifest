@@ -130,7 +130,7 @@ a.btn:active {
     /* Ensure loader is above other content */
     z-index: 500;
     /* Flexbox to center loader content */
-    display: flex;
+    display: none;
     /* Initially hidden, shown via JS */
     justify-content: center;
     align-items: center;
