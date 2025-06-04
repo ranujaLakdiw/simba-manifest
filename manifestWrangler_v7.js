@@ -577,6 +577,7 @@ const uploadToGoogleSheet = async (pickups, dropoffs, pickup_url, dropoff_url) =
                 console.error(`🥸 Error uploading row ${uploadedRows + 1} (Key: ${key}):`, error.message);
                 if (loaderElement) loaderElement.style.display = 'none'; // Hide loader on error
                 alert(`😱 Error during upload at row ${uploadedRows + 1}: ${error.message} \nCheck console. Upload stopped.`);
+                window.alert(`Upload stopped due to an error. ${error.message} \nPlease check the console for details.`);
                 return; // Stop the upload process
             }
         }
